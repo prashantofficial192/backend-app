@@ -3,6 +3,7 @@ import cors from 'cors';
 import connectMongoDB from './config/db.js';
 import dotenv from 'dotenv';
 import userRoutes from "./routes/userRoutes.js"
+import experienceRoutes from "./routes/Experience/experienceRoutes.js"
 import swaggerDocs from './middleware/swagger.js';
 dotenv.config();
 
@@ -21,6 +22,7 @@ connectMongoDB();
 
 app.use(express.json());
 app.use("/api", userRoutes);
+app.use("/api", experienceRoutes);
 swaggerDocs(app);
 
 app.get('/', (req, res) => {
