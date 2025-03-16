@@ -17,7 +17,6 @@ const router = express.Router();
  */
 
 /**
-/**
  * @swagger
  * /api/experience:
  *   get:
