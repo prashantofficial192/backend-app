@@ -18,67 +18,70 @@ export async function getAllBlogs(req, res) {
 // create blog
 export async function createBlog(req, res) {
     try {
-        // Check if the uploaded file exists
-        if (!req.file) {
-            return res.status(400).json({
-                // If no file uploaded, return a 400 response
-                message: 'No file uploaded. Please upload an image.',
-            });
+        const files = req.files;
+
+        if (!files || !files.image || !files.authorAvatar) {
+            return res.status(400).json({ message: 'Both image and authorAvatar are required.' });
         }
 
-        // Use streamifier to convert the uploaded file buffer to a readable stream
-        const stream = cloudinary.uploader.upload_stream(
-            {
-                resource_type: 'auto',
-                folder: 'blogs',
-            }, // Automatically determine the resource type (image, video, etc.)
-            async (error, result) => {
-                // Callback function for when the upload completes
-                if (error) {
-                    return res.status(500).json({
-                        // Handle any errors during the upload
-                        message: 'Error uploading image to Cloudinary',
-                        error: error.message,
-                    });
+        // Upload blog image
+        const blogImageUpload = await new Promise((resolve, reject) => {
+            const stream = cloudinary.uploader.upload_stream(
+                {
+                    resource_type: 'auto',
+                    folder: 'blogs',
+                },
+                (error, result) => {
+                    if (error) reject(error);
+                    else resolve(result);
                 }
+            );
+            streamifier.createReadStream(files.image[0].buffer).pipe(stream);
+        });
 
-                // Create the new blog entry with the URL returned from Cloudinary
-                const newBlog = new Blog({
-                    ...req.body, // Spread the other fields from the request body
-                    blogFeaturedImage: result.secure_url, // Use the secure URL from Cloudinary as the featured image
-                });
+        // Upload author avatar
+        const authorAvatarUpload = await new Promise((resolve, reject) => {
+            const stream = cloudinary.uploader.upload_stream(
+                {
+                    resource_type: 'auto',
+                    folder: 'authors',
+                },
+                (error, result) => {
+                    if (error) reject(error);
+                    else resolve(result);
+                }
+            );
+            streamifier.createReadStream(files.authorAvatar[0].buffer).pipe(stream);
+        });
 
-                // Save the new blog entry to the database
-                const savedBlog = await newBlog.save();
+        // Optional: convert tags from comma-separated string to array
+        const tags = req.body.tags
+            ? req.body.tags.split(',').map(tag => tag.trim())
+            : [];
 
-                res.status(201).json({
-                    // Return a success response with the created blog
-                    message: 'Blog created successfully',
-                    blogCreated: savedBlog,
-                });
-            }
-        );
-
-        // Pipe the buffer of the uploaded file to the Cloudinary upload stream
-        streamifier.createReadStream(req.file.buffer).pipe(stream);
-    } catch (error) {
-        if (error.name === 'ValidationError') {
-            const errors = {};
-
-            // Extract field-specific validation errors
-            Object.keys(error.errors).forEach(key => {
-                errors[key] = error.errors[key].message;
-            });
-
-            return res.status(400).json({
-                message: 'Validation Error',
-                errors
-            });
+        if (!req.body.slug || req.body.slug.trim() === "") {
+            delete req.body.slug; // <-- Important: let Mongoose pre-save hook handle it
         }
 
-        res.status(400).json({
-            message: 'Error creating experience',
-            error: error.message
+        const newBlog = new Blog({
+            ...req.body,
+            tags,
+            image: blogImageUpload.secure_url,
+            authorAvatar: authorAvatarUpload.secure_url,
+        });
+
+        const savedBlog = await newBlog.save();
+
+        res.status(201).json({
+            message: 'Blog created successfully',
+            blogCreated: savedBlog,
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            message: 'Error creating blog',
+            error: error.message,
         });
     }
 }

@@ -27,7 +27,7 @@ const blogSchema = new mongoose.Schema(
         },
         slug: {
             type: String,
-            required: [true, 'Slug is required'],
+            unique: true,
         },
         authorName: {
             type: String,
@@ -58,7 +58,7 @@ blogSchema.pre('save', function (next) {
         this.slug = slugify(this.blogTitle, { lower: true, strict: true });
     }
     next();
-})
+});
 
 const Blog = mongoose.model('Blog', blogSchema);
 

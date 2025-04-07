@@ -78,7 +78,6 @@ router.get('/blogs', getAllBlogs);
  *               - tags
  *               - image
  *               - readingTime
- *               - slug
  *               - authorName
  *               - authorAvatar
  *               - isLatestBlog
@@ -148,7 +147,11 @@ router.get('/blogs', getAllBlogs);
  *                   type: string
  */
 
-// router.post('/blogs', upload.single('image'), createBlog);
+router.post('/blogs', upload.fields([
+    { name: 'image', maxCount: 1 },
+    { name: 'authorAvatar', maxCount: 1 }
+]), createBlog);
+
 
 export default router;
 
