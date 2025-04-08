@@ -1,11 +1,11 @@
 import swaggerJSDoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 
-const SERVER_URL = process.env.NODE_ENV === "production"
-    ? "https://backend-m0sz.onrender.com"
-    : `http://localhost:${process.env.PORT || 3000}`;
+// const SERVER_URL = process.env.NODE_ENV === "production"
+//     ? "https://backend-m0sz.onrender.com"
+//     : `http://localhost:${process.env.PORT || 3000}`;
 
-// const SERVER_URL = `http://localhost:${process.env.PORT || 3000}`;
+const SERVER_URL = `http://localhost:${process.env.PORT || 3000}`;
 
 const options = {
     definition: {

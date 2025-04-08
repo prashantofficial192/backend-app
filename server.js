@@ -4,6 +4,7 @@ import connectMongoDB from './config/db.js';
 import dotenv from 'dotenv';
 import experienceRoutes from "./routes/Experience/experienceRoutes.js"
 import educationRoutes from "./routes/Education/educationRoutes.js"
+import skillRoutes from "./routes/Skill/skillRoutes.js"
 import blogsRoutes from "./routes/Blog/blogRoutes.js"
 import swaggerDocs from './middleware/swagger.js';
 dotenv.config();
@@ -25,6 +26,7 @@ app.use(express.json());
 app.use("/api", blogsRoutes);
 app.use("/api", experienceRoutes);
 app.use("/api", educationRoutes);
+app.use("/api", skillRoutes)
 swaggerDocs(app);
 
 app.get('/', (req, res) => {

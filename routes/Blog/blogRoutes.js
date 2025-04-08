@@ -2,7 +2,10 @@ import express from 'express';
 import upload from "../../middleware/multer.js"
 import {
     getAllBlogs,
-    createBlog
+    getBlogById,
+    createBlog,
+    deleteBlogById,
+    updateBlogById
 } from '../../controllers/Blog/blogController.js';
 
 const router = express.Router();
@@ -56,6 +59,51 @@ const router = express.Router();
 
 
 router.get('/blogs', getAllBlogs);
+
+/**
+ * @swagger
+ * /api/blogs/{id}:
+ *   get:
+ *     summary: Retrieve a blog post by ID
+ *     description: Fetch a single blog post by its unique ID.
+ *     tags: [Blog]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: MongoDB ObjectId of the blog post
+ *     responses:
+ *       200:
+ *         description: Blog post fetched successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/Blog"
+ *       404:
+ *         description: Blog post not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       500:
+ *         description: Server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 error:
+ *                   type: string
+ */
+
+router.get('/blogs/:id', getBlogById);
 
 /**
  * @swagger
@@ -151,6 +199,146 @@ router.post('/blogs', upload.fields([
     { name: 'image', maxCount: 1 },
     { name: 'authorAvatar', maxCount: 1 }
 ]), createBlog);
+
+
+/**
+ * @swagger
+ * /api/blogs/{id}:
+ *   delete:
+ *     summary: Delete a blog post by ID
+ *     description: Remove a single blog post from the database using its ID.
+ *     tags: [Blog]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: MongoDB ObjectId of the blog post to delete
+ *     responses:
+ *       200:
+ *         description: Blog post deleted successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       404:
+ *         description: Blog post not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       500:
+ *         description: Server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 error:
+ *                   type: string
+ */
+
+router.delete('/blogs/:id', deleteBlogById);
+
+/**
+ * @swagger
+ * /api/blogs/{id}:
+ *   put:
+ *     summary: Update an existing blog post by ID
+ *     description: Update blog post fields including image and author avatar by providing the blog ID.
+ *     tags: [Blog]
+ *     consumes:
+ *       - multipart/form-data
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: MongoDB ObjectId of the blog post to update
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               blogTitle:
+ *                 type: string
+ *               content:
+ *                 type: string
+ *               tags:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *               readingTime:
+ *                 type: number
+ *               slug:
+ *                 type: string
+ *               authorName:
+ *                 type: string
+ *               authorAvatar:
+ *                 type: string
+ *                 format: binary
+ *               isLatestBlog:
+ *                 type: boolean
+ *               status:
+ *                 type: string
+ *                 enum: [draft, published]
+ *     responses:
+ *       200:
+ *         description: Blog post updated successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/Blog"
+ *       400:
+ *         description: Invalid request data.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       404:
+ *         description: Blog post not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       500:
+ *         description: Server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 error:
+ *                   type: string
+ */
+
+router.put('/blogs/:id', upload.fields([
+    { name: 'image', maxCount: 1 },
+    { name: 'authorAvatar', maxCount: 1 }
+]), updateBlogById);
 
 
 export default router;
