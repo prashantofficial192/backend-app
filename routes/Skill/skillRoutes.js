@@ -226,7 +226,7 @@ router.get('/skills/:id', getSkillById)
  *                   type: string
  */
 
-router.put('/skills/:id', updateSkillById)
+router.put('/skills/:id', upload.single('image'), updateSkillById)
 
 /**
  * @swagger

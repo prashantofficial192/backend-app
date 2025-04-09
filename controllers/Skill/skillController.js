@@ -98,7 +98,7 @@ export async function updateSkillById(req, res) {
         const file = req.file
         let skillImageUrl;
 
-        if (file && file.image) {
+        if (file) {
             const skillImageUpload = await new Promise((resolve, reject) => {
                 const stream = cloudinary.uploader.upload_stream(
                     {
