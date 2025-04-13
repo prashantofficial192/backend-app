@@ -1,5 +1,6 @@
 import swaggerJSDoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
+import swaggerAuth from "./swaggerAuth.js";
 
 // const SERVER_URL = process.env.NODE_ENV === "production"
 //     ? "https://backend-m0sz.onrender.com"
@@ -29,6 +30,7 @@ const swaggerSpec = swaggerJSDoc(options);
 
 const swaggerDocs = (app) => {
     app.use("/api-docs",
+        swaggerAuth,
         swaggerUi.serve,
         swaggerUi.setup(swaggerSpec)
     );
