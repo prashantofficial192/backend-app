@@ -22,7 +22,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const allowedOrigins = [
-    "https://www.prashantcodes.dev",
+    "https://prashantcodes.dev",
     "http://localhost:3000",
     "http://localhost:5173"
 ];
