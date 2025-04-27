@@ -21,14 +21,27 @@ const PORT = process.env.PORT || 3000;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const allowedOrigins = [
+    "https://www.prashantcodes.dev",
+    "http://localhost:3000",
+    "http://localhost:5173"
+];
+
 app.use(
     cors({
-        origin: ["https://www.prashantcodes.dev", "http://localhost:3000", "http://localhost:5173"],
+        origin: (origin, callback) => {
+            if (!origin || allowedOrigins.includes(origin)) {
+                callback(null, origin); // allow this origin
+            } else {
+                callback(new Error("Not allowed by CORS"));
+            }
+        },
         methods: ["GET", "POST", "PUT", "DELETE"],
         allowedHeaders: ["Content-Type", "Authorization"],
         credentials: true,
     })
 );
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 connectMongoDB();
